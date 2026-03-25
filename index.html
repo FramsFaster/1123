@@ -12,7 +12,7 @@
     const speedControls = document.getElementById('speedControls');
     
     // 🎵 Аудио
-    const bgMusic = document.getElementById('bgMusic'); // фоновая музыка
+    const bgMusic = document.getElementById('bgMusic');      // фоновая музыка
     const deathSound = document.getElementById('deathSound'); // звук смерти
 
     // Константы
@@ -39,7 +39,15 @@
         snakeColor: '#00FF00'
     };
     const SPEED_LEVELS = [400, 300, 200, 150, 100, 50, 20];
-    const SPEED_TEXTS = ['🐌 Очень медленная', '🐌 Медленная', '🐍 Нормальная', '⚡ Быстрая', '🚀 Очень быстрая', '💨 Максимальная', '🔥 Турбо'];
+    const SPEED_TEXTS = [
+        '🐌 Очень медленная',
+        '🐌 Медленная',
+        '🐍 Нормальная',
+        '⚡ Быстрая',
+        '🚀 Очень быстрая',
+        '💨 Максимальная',
+        '🔥 Турбо'
+    ];
 
     const COLORS = ['#00FF00', '#FF00FF', '#00FFFF', '#FFFF00', '#FF6600', '#FF1493'];
 
@@ -70,18 +78,18 @@
         ctx.fillStyle = BLACK;
         ctx.font = 'bold 48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('🐍 ЗМЕЙКА', WINDOW_WIDTH/2, 150);
+        ctx.fillText('🐍 ЗМЕЙКА', WINDOW_WIDTH / 2, 150);
         
         ctx.fillStyle = '#4CAF50';
         ctx.fillRect(250, 250, 300, 80);
         ctx.fillStyle = WHITE;
         ctx.font = 'bold 32px Arial';
-        ctx.fillText('▶️ ИГРАТЬ', WINDOW_WIDTH/2, 300);
+        ctx.fillText('▶️ ИГРАТЬ', WINDOW_WIDTH / 2, 300);
         
         ctx.fillStyle = '#2196F3';
         ctx.fillRect(250, 360, 300, 80);
         ctx.fillStyle = WHITE;
-        ctx.fillText('🎨 ВИД', WINDOW_WIDTH/2, 410);
+        ctx.fillText('🎨 ВИД', WINDOW_WIDTH / 2, 410);
     }
 
     function drawColorScreen() {
@@ -91,7 +99,7 @@
         ctx.fillStyle = BLACK;
         ctx.font = 'bold 48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('🎨 ВЫБЕРИ ЦВЕТ', WINDOW_WIDTH/2, 100);
+        ctx.fillText('🎨 ВЫБЕРИ ЦВЕТ', WINDOW_WIDTH / 2, 100);
         
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'left';
@@ -164,10 +172,16 @@
             gameRunning: true,
             snakeColor: gameState.snakeColor
         };
-        scoreElement.textContent = 0;
+        scoreElement.textContent = '0';
         speedElement.textContent = SPEED_TEXTS[0];
         gameOverElement.style.display = 'block';
-        setTimeout(() => { gameOverElement.style.display = 'none'; }, 2000);
+        setTimeout(() => {
+            gameOverElement.style.display = 'none';
+        }, 2000);
+    }
+
+    function checkWallCollision(head) {
+        return head.x < 0 || head.x >= WINDOW_WIDTH || head.y < 0 || head.y >= WINDOW_HEIGHT;
     }
 
     function moveSnake() {
@@ -193,10 +207,6 @@
         }
     }
 
-    function checkWallCollision(head) {
-        return head.x < 0 || head.x >= WINDOW_WIDTH || head.y < 0 || head.y >= WINDOW_HEIGHT;
-    }
-
     function drawGame() {
         ctx.fillStyle = BEIGE;
         ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -219,7 +229,7 @@
             drawMainMenu();
         } else if (currentScreen === 'color') {
             drawColorScreen();
-        } else if (currentScreen === 'game' && gameState) {
+        } else if (currentScreen === 'game') {
             const now = Date.now();
             if (gameState.gameRunning && now - gameState.lastMoveTime >= SPEED_LEVELS[gameState.speedLevel]) {
                 moveSnake();
@@ -230,14 +240,14 @@
         requestAnimationFrame(gameLoop);
     }
 
-    // Запускаем игру при загрузке страницы
+    // Запуск игры при загрузке страницы
     window.addEventListener('load', () => {
-        header.classList.add('hidden');
+        header.classList.add('hidden');      // меню скрыто, пока мы в меню
         speedControls.style.display = 'none';
-        gameLoop(); // запускаем цикл отрисовки
+        gameLoop();
     });
 
-    // Один обработчик клика по canvas
+    // Общий обработчик клика по canvas
     canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -277,7 +287,7 @@
         }
     });
 
-    // Управление скоростью кнопками
+    // Кнопки скорости
     speedMinusBtn.addEventListener('click', () => {
         if (currentScreen === 'game') {
             gameState.speedLevel = Math.max(0, gameState.speedLevel - 1);
@@ -300,7 +310,7 @@
         pauseBtn.classList.toggle('paused', !gameState.gameRunning);
     });
 
-    // Меню
+    // Кнопка меню
     menuBtn.addEventListener('click', () => {
         if (currentScreen === 'game') {
             currentScreen = 'main';
@@ -312,29 +322,21 @@
         }
     });
 
-    // Управление клавишами (по желанию)
+    // Управление клавишами (WASD / стрелки)
     document.addEventListener('keydown', (e) => {
         if (currentScreen !== 'game' || !gameState.gameRunning) return;
         const dir = gameState.direction;
         switch (e.key) {
-            case 'ArrowRight':
-            case 'd':
-            case 'D':
+            case 'ArrowRight': case 'd': case 'D':
                 if (dir.x === 0) gameState.direction = {x: 1, y: 0};
                 break;
-            case 'ArrowLeft':
-            case 'a':
-            case 'A':
+            case 'ArrowLeft': case 'a': case 'A':
                 if (dir.x === 0) gameState.direction = {x: -1, y: 0};
                 break;
-            case 'ArrowUp':
-            case 'w':
-            case 'W':
+            case 'ArrowUp': case 'w': case 'W':
                 if (dir.y === 0) gameState.direction = {x: 0, y: -1};
                 break;
-            case 'ArrowDown':
-            case 's':
-            case 'S':
+            case 'ArrowDown': case 's': case 'S':
                 if (dir.y === 0) gameState.direction = {x: 0, y: 1};
                 break;
         }
